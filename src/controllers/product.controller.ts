@@ -3,7 +3,17 @@ import prisma from "../db";
 
 export const all = async (req: Request, res: Response) => {
     try {
-        const response = await prisma.produtos.findMany();
+        const query = req.query;
+        const filters = query["facet-filters"];
+        const page = query["page"];
+        const sort = query["sort"];
+
+        const response = await prisma.product.findMany({
+            include: {
+                category: true,
+                images: true,
+            },
+        });
 
         res.json(response);
     } catch (err) {
@@ -13,17 +23,20 @@ export const all = async (req: Request, res: Response) => {
 
 export const create = async (req: Request, res: Response) => {
     try {
-        const { name, description, friendlyName, image, price, priceWithDiscount, oldPrice, discountPercentage } = req.body;
-        const response = await prisma.produtos.create({
+        const { name, description, slug, image, price, priceWithDiscount, oldPrice, discountPercentage, quantity, available, categoryId } = req.body;
+        const response = await prisma.product.create({
             data: {
                 name,
                 description,
-                friendlyName,
+                slug,
                 image,
                 price,
                 priceWithDiscount,
                 oldPrice,
                 discountPercentage,
+                quantity,
+                available,
+                categoryId,
             },
         });
 
@@ -38,17 +51,20 @@ export const create = async (req: Request, res: Response) => {
 
 export const update = async (req: Request, res: Response) => {
     try {
-        const { name, description, friendlyName, image, price, priceWithDiscount, oldPrice, discountPercentage, id } = req.body;
-        const response = await prisma.produtos.update({
+        const { name, description, slug, image, price, priceWithDiscount, oldPrice, discountPercentage, quantity, available, categoryId, id } = req.body;
+        const response = await prisma.product.update({
             data: {
                 name,
                 description,
-                friendlyName,
+                slug,
                 image,
                 price,
                 priceWithDiscount,
                 oldPrice,
                 discountPercentage,
+                quantity,
+                available,
+                categoryId,
             },
             where: {
                 id,
@@ -67,7 +83,7 @@ export const update = async (req: Request, res: Response) => {
 export const get = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const response = await prisma.produtos.findUnique({
+        const response = await prisma.product.findUnique({
             where: {
                 id: Number(id),
             },
@@ -76,5 +92,23 @@ export const get = async (req: Request, res: Response) => {
         res.json(response);
     } catch (err) {
         res.status(500).json({ error: "Erro ao obter Produto." });
+    }
+};
+
+export const del = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.body;
+        const response = await prisma.product.delete({
+            where: {
+                id,
+            },
+        });
+
+        res.json({
+            message: "Produto deletado com sucesso!",
+            response
+        });
+    } catch (err) {
+        res.status(500).json({ error: "Erro ao deletar Produto." });
     }
 };

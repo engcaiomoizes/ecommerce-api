@@ -14,39 +14,167 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Clientes {
+enum Gender {
+  M
+  F
+}
+
+enum Type {
+  F
+  J
+}
+
+model User {
   id String @id @default(cuid())
-  nome String
-  cpf String @db.VarChar(14)
-  dataNascimento String @db.VarChar(10)
-  telefone String @db.VarChar(15)
-  email String
+  name String
+  cpf String @db.VarChar(14) @unique
+  celphone String @db.VarChar(15)
+  gender Gender
+  birth String @db.VarChar(10)
+  type Type
+  credit Decimal @default(0)
+  email String @unique
   password String
+  receiveNewsletter Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime?
+
+  addresses Address[]
+  orders Order[]
+
+  @@map("users")
 }
 
-model Enderecos {
-  id String @id @default(cuid())
-  clienteId String
-  cep String @db.VarChar(10)
-  logradouro String @db.VarChar(100)
-  numero String? @db.VarChar(10)
-  complemento String? @db.VarChar(50)
-  bairro String @db.VarChar(50)
-  cidade String @db.VarChar(60)
-  uf String @db.Char(2)
-  identificacao String @db.VarChar(20)
+model Address {
+  id Int @id @default(autoincrement())
+  userId String
+  main Boolean @default(false)
+  identification String @db.VarChar(50)
+  zipCode String @db.VarChar(10)
+  street String @db.VarChar(100)
+  number String? @db.VarChar(10)
+  complement String? @db.VarChar(50)
+  district String @db.VarChar(50)
+  reference String? @db.VarChar(100)
+  city String @db.VarChar(50)
+  state String @db.Char(2)
+  address String
+  createdAt DateTime @default(now())
+  updatedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("addresses")
 }
 
-model Produtos {
+model Product {
   id Int @id @default(autoincrement())
   name String
   description String @db.Text
-  friendlyName String
+  slug String
   image String
   price Decimal @db.Money
   priceWithDiscount Decimal? @db.Money
   oldPrice Decimal? @db.Money
   discountPercentage Int? @db.SmallInt
+  quantity Int @default(0)
+  available Boolean @default(true)
+  categoryId Int
+  createdAt DateTime @default(now())
+
+  images Product_Image[]
+
+  category Category @relation(fields: [categoryId], references: [id])
+
+  @@map("products")
+}
+
+model Category {
+  id Int @id @default(autoincrement())
+  parentId Int?
+  name String
+  slug String
+
+  parents Category[] @relation("Parent")
+  products Product[]
+
+  parent Category? @relation("Parent", fields: [parentId], references: [id])
+
+  @@map("categories")
+}
+
+enum Size {
+  original
+  p
+  m
+  g
+  gg
+}
+
+model Product_Image {
+  id Int @id @default(autoincrement())
+  productId Int
+  size Size
+  url String
+  position Int @db.SmallInt @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime?
+
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("product_images")
+}
+
+model Order {
+  id String @id @default(cuid())
+  userId String
+  date DateTime @db.Timestamp()
+  status Int @db.SmallInt
+  statusDescription String @db.VarChar(30)
+  totalValue Decimal
+  deliveryTime DateTime @db.Timestamp()
+
+  products Order_Product[]
+  paymentInformation Order_Payment[]
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("orders")
+}
+
+model Order_Product {
+  id Int @id @default(autoincrement())
+  orderId String
+  quantity Int @db.SmallInt @default(1)
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@map("order_products")
+}
+
+enum PaymentMethod {
+  PIX
+  BOLETO
+  CARTAO
+  CARTAO_PARCELADO
+  PAYPAL
+  OUTROS
+}
+
+model Order_Payment {
+  id Int @id @default(autoincrement())
+  orderId String
+  paymentDate DateTime @db.Timestamp()
+  paymentMethod PaymentMethod
+  paymentDescription String @db.VarChar(30)
+  boletoId String?
+  referenceId String?
+  emv String?
+  txid String?
+  paymentExpired Boolean @default(false)
+  paymentExpirationDate DateTime @db.Timestamp()
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@map("order_payments")
 }
