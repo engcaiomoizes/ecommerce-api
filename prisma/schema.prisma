@@ -6,7 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  // output   = "../generated/prisma/clientPg"
 }
 
 datasource db {
@@ -24,4 +24,29 @@ model Clientes {
   password String
   createdAt DateTime @default(now())
   updatedAt DateTime?
+}
+
+model Enderecos {
+  id String @id @default(cuid())
+  clienteId String
+  cep String @db.VarChar(10)
+  logradouro String @db.VarChar(100)
+  numero String? @db.VarChar(10)
+  complemento String? @db.VarChar(50)
+  bairro String @db.VarChar(50)
+  cidade String @db.VarChar(60)
+  uf String @db.Char(2)
+  identificacao String @db.VarChar(20)
+}
+
+model Produtos {
+  id Int @id @default(autoincrement())
+  name String
+  description String @db.Text
+  friendlyName String
+  image String
+  price Decimal @db.Money
+  priceWithDiscount Decimal? @db.Money
+  oldPrice Decimal? @db.Money
+  discountPercentage Int? @db.SmallInt
 }
