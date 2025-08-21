@@ -62,7 +62,7 @@ model Address {
   createdAt DateTime @default(now())
   updatedAt DateTime?
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@map("addresses")
 }
@@ -77,14 +77,16 @@ model Product {
   priceWithDiscount Decimal? @db.Money
   oldPrice Decimal? @db.Money
   discountPercentage Int? @db.SmallInt
+  maxInstallment String? @db.VarChar(30)
   quantity Int @default(0)
   available Boolean @default(true)
-  categoryId Int
+  categoryId Int?
   createdAt DateTime @default(now())
 
   images Product_Image[]
+  offers Offer_Product[]
 
-  category Category @relation(fields: [categoryId], references: [id])
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull, onUpdate: SetNull)
 
   @@map("products")
 }
@@ -98,7 +100,7 @@ model Category {
   parents Category[] @relation("Parent")
   products Product[]
 
-  parent Category? @relation("Parent", fields: [parentId], references: [id])
+  parent Category? @relation("Parent", fields: [parentId], references: [id], onDelete: SetNull)
 
   @@map("categories")
 }
@@ -120,7 +122,7 @@ model Product_Image {
   createdAt DateTime @default(now())
   updatedAt DateTime?
 
-  product Product @relation(fields: [productId], references: [id])
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@map("product_images")
 }
@@ -137,7 +139,7 @@ model Order {
   products Order_Product[]
   paymentInformation Order_Payment[]
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@map("orders")
 }
@@ -147,7 +149,7 @@ model Order_Product {
   orderId String
   quantity Int @db.SmallInt @default(1)
 
-  order Order @relation(fields: [orderId], references: [id])
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@map("order_products")
 }
@@ -174,7 +176,34 @@ model Order_Payment {
   paymentExpired Boolean @default(false)
   paymentExpirationDate DateTime @db.Timestamp()
 
-  order Order @relation(fields: [orderId], references: [id])
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@map("order_payments")
+}
+
+model Offer {
+  id Int @id @default(autoincrement())
+  name String
+  referenceBanner String
+  startsAt DateTime @db.Timestamp()
+  endsAt DateTime @db.Timestamp()
+
+  products Offer_Product[]
+
+  @@map("offers")
+}
+
+model Offer_Product {
+  hashCode String @id @default(cuid())
+  productId Int
+  offerId Int
+  price Decimal @db.Money
+  priceWithDiscount Decimal @db.Money
+  discountPercentage Int @db.SmallInt
+  quantityAvailable Int @db.SmallInt
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  offer Offer @relation(fields: [offerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("offer_products")
 }

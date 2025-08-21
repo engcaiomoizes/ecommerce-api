@@ -5,7 +5,12 @@ export const all = async (req: Request, res: Response) => {
     try {
         const response = await prisma.category.findMany({
             include: {
-                parent: true,
+                parent: {
+                    include: {
+                        parent: true,
+                    },
+                },
+                parents: true,
             },
         });
 
@@ -31,6 +36,7 @@ export const create = async (req: Request, res: Response) => {
             response
         });
     } catch (err) {
+        console.error(err);
         res.status(500).json({ error: "Erro ao cadastrar Categoria." });
     }
 };
@@ -64,6 +70,14 @@ export const get = async (req: Request, res: Response) => {
         const response = await prisma.category.findUnique({
             where: {
                 id: Number(id),
+            },
+            include: {
+                parent: {
+                    include: {
+                        parent: true,
+                    },
+                },
+                parents: true,
             },
         });
 
