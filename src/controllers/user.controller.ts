@@ -10,9 +10,9 @@ export const all = async (req: Request, res: Response) => {
             },
         });
 
-        res.json(response);
+        return res.json(response);
     } catch (err) {
-        res.status(500).json({ error: "Erro ao obter Clientes." });
+        return res.status(500).json({ error: "Erro ao obter Clientes." });
     }
 };
 
@@ -34,12 +34,12 @@ export const create = async (req: Request, res: Response) => {
             },
         });
 
-        res.json({
+        return res.json({
             message: "Cliente cadastrado com sucesso!",
             response
         });
     } catch (err) {
-        res.status(500).json({ error: "Erro ao cadastrar Cliente." });
+        return res.status(500).json({ error: "Erro ao cadastrar Cliente." });
     }
 };
 
@@ -63,12 +63,12 @@ export const update = async (req: Request, res: Response) => {
             },
         });
 
-        res.json({
+        return res.json({
             message: "Cliente atualizado com sucesso!",
             response
         });
     } catch (err) {
-        res.status(500).json({ error: "Erro ao atualizar Cliente." });
+        return res.status(500).json({ error: "Erro ao atualizar Cliente." });
     }
 };
 
@@ -81,9 +81,9 @@ export const get = async (req: Request, res: Response) => {
             },
         });
 
-        res.json(response);
+        return res.json(response);
     } catch (err) {
-        res.status(500).json({ error: "Erro ao obter Cliente." });
+        return res.status(500).json({ error: "Erro ao obter Cliente." });
     }
 };
 
@@ -96,12 +96,12 @@ export const del = async (req: Request, res: Response) => {
             },
         });
 
-        res.json({
+        return res.json({
             message: "Cliente deletado com sucesso!",
             response
         });
     } catch (err) {
-        res.status(500).json({ error: "Erro ao deletar Cliente." });
+        return res.status(500).json({ error: "Erro ao deletar Cliente." });
     }
 };
 
@@ -115,9 +115,9 @@ export const getAddresses = async (req: Request, res: Response) => {
             },
         });
 
-        res.json(response);
+        return res.json(response);
     } catch (err) {
-        res.status(500).json({ error: "Erro ao obter Endereços." })
+        return res.status(500).json({ error: "Erro ao obter Endereços." })
     }
 };
 
@@ -142,11 +142,30 @@ export const createAddress = async (req: Request, res: Response) => {
             },
         });
 
-        res.json({
+        return res.json({
             message: "Endereço cadastrado com sucesso!",
             response
         });
     } catch (err) {
-        res.status(500).json({ error: "Erro ao cadastrar Endereço." });
+        return res.status(500).json({ error: "Erro ao cadastrar Endereço." });
+    }
+};
+
+export const delAddress = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { addressId } = req.body;
+        const response = await prisma.address.delete({
+            where: {
+                id: addressId,
+            },
+        });
+
+        return res.json({
+            message: "Endereço deletado com sucesso!",
+            response
+        });
+    } catch (err) {
+        return res.status(500).json({ error: "Erro ao deletar Endereço." });
     }
 };

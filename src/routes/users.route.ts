@@ -13,5 +13,6 @@ router.get("/:id", controller.get);
 // Addresses
 router.get("/:id/addresses", controller.getAddresses);
 router.post("/:id/addresses", controller.createAddress);
+router.delete("/:id/addresses", controller.delAddress);
 
 export default router;
