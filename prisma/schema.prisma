@@ -80,6 +80,8 @@ model Product {
   maxInstallment String? @db.VarChar(30)
   quantity Int @default(0)
   available Boolean @default(true)
+  ratingCount Int @db.SmallInt @default(0)
+  thumbnail String
   categoryId Int?
   createdAt DateTime @default(now())
 
