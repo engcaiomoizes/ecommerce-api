@@ -19,28 +19,31 @@ export const all = async (req: Request, res: Response) => {
             console.log(filt);
         }
 
-        const response = await prisma.product.findMany({
-            include: {
-                category: {
-                    include: {
-                        parent: true,
+        const [response, count] = await prisma.$transaction([
+            prisma.product.findMany({
+                include: {
+                    category: {
+                        include: {
+                            parent: true,
+                        },
+                    },
+                    images: true,
+                    offers: {
+                        omit: {
+                            productId: true,
+                        },
+                        include: {
+                            offer: true,
+                        },
                     },
                 },
-                images: true,
-                offers: {
-                    omit: {
-                        productId: true,
-                    },
-                    include: {
-                        offer: true,
-                    },
+                omit: {
+                    categoryId: true,
                 },
-            },
-            omit: {
-                categoryId: true,
-            },
-            ...(isNaN(limit) ? {} : { take: limit, skip: skip }),
-        });
+                ...(isNaN(limit) ? {} : { take: limit, skip: skip }),
+            }),
+            prisma.product.count(),
+        ]);
 
         const formattedResponse = response.map((product) => {
             const offerPivot = product.offers[0];
@@ -76,7 +79,7 @@ export const all = async (req: Request, res: Response) => {
             };
         });
 
-        res.json(formattedResponse);
+        res.json({response: formattedResponse, count});
     } catch (err) {
         res.status(500).json({ error: "Erro ao obter Produtos." });
     }
