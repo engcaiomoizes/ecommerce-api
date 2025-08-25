@@ -87,7 +87,7 @@ export const all = async (req: Request, res: Response) => {
 
 export const create = async (req: Request, res: Response) => {
     try {
-        const { name, description, slug, image, price, priceWithDiscount, oldPrice, discountPercentage, maxInstallment, quantity, available, categoryId } = req.body;
+        const { name, description, slug, image, price, priceWithDiscount, oldPrice, discountPercentage, maxInstallment, quantity, available, ratingCount, thumbnail, categoryId } = req.body;
         const response = await prisma.product.create({
             data: {
                 name,
@@ -101,6 +101,8 @@ export const create = async (req: Request, res: Response) => {
                 maxInstallment,
                 quantity,
                 available,
+                ratingCount,
+                thumbnail,
                 categoryId,
             },
         });
@@ -116,7 +118,7 @@ export const create = async (req: Request, res: Response) => {
 
 export const update = async (req: Request, res: Response) => {
     try {
-        const { name, description, slug, image, price, priceWithDiscount, oldPrice, discountPercentage, maxInstallment, quantity, available, categoryId, id } = req.body;
+        const { name, description, slug, image, price, priceWithDiscount, oldPrice, discountPercentage, maxInstallment, quantity, available, ratingCount, thumbnail, categoryId, id } = req.body;
         const response = await prisma.product.update({
             data: {
                 name,
@@ -130,6 +132,8 @@ export const update = async (req: Request, res: Response) => {
                 maxInstallment,
                 quantity,
                 available,
+                ratingCount,
+                thumbnail,
                 categoryId,
             },
             where: {

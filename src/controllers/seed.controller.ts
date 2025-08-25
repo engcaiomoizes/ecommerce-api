@@ -8,11 +8,11 @@ const productsJson = productsJsonRaw as any;
 const getCategoryId = (key: string) => {
     switch (key) {
         case "cpu": return 2;
-        case "gpu": return 3; 
-        case "motherboard": return 4;
-        case "ram": return 5;
-        case "fonte": return 6;
-        case "ssd": return 7;
+        case "gpu": return 8; 
+        case "motherboard": return 3;
+        case "ram": return 4;
+        case "fonte": return 5;
+        case "ssd": return 6;
         case "airCooler": return 9;
         case "waterCooler": return 10;
         case "fan": return 11;
@@ -46,6 +46,8 @@ export const products = async (req: Request, res: Response) => {
                         discountPercentage: product.discountPercentage,
                         maxInstallment: product.maxInstallment,
                         quantity: product.quantity,
+                        ratingCount: product.ratingCount,
+                        thumbnail: product.thumbnail,
                         available: true,
                         categoryId: getCategoryId(categoryKey),
 
